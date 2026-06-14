@@ -57,6 +57,8 @@ with col3:
         while Rn < R:
             calc_lo += 0.0005
             Rn = calc_lo * F * (1 - (0.5 * calc_lo * m))
+            if calc_lo > 0.05: 
+                break
     else:
         calc_lo = 0.0
     
@@ -117,8 +119,10 @@ if calc_m_neg:
             m = F / (0.85 * C)
             Rn_neg = calc_lo_neg * F * (1 - (0.5 * calc_lo_neg * m))
             while Rn_neg < R_neg:
-                calc_lo_neg += 0.001
+                calc_lo_neg += 0.0005
                 Rn_neg = calc_lo_neg * F * (1 - (0.5 * calc_lo_neg * m))
+                if calc_lo_neg > 0.05:
+                    break
         else:
             calc_lo_neg = 0.0
             
