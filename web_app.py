@@ -48,18 +48,28 @@ col3, col4 = st.columns(2)
 with col3:
     MaxP = st.number_input("โมเมนต์บวกสูงสุด Mmax+ (Ton-m)", min_value=0.0, value=1.5, step=0.1)
 
-R = (100 * MaxP) / (0.9 * b * d**2) if MaxP > 0 else 0
-lo = 14 / F
-m = F / (0.85 * C)
-Rn = lo * F * (1 - (0.5 * lo * m))
+    # คำนวณ Rho ที่ต้องการ
+    if MaxP > 0:
+        R = (100 * MaxP) / (0.9 * b * d**2)
+        calc_lo = 14 / F
+        m = F / (0.85 * C)
+        Rn = calc_lo * F * (1 - (0.5 * calc_lo * m))
+        while Rn < R:
+            calc_lo += 0.0005
+            Rn = calc_lo * F * (1 - (0.5 * calc_lo * m))
+    else:
+        calc_lo = 0.0
+    
+    # 🌟 ฟีเจอร์ใหม่: โชว์ Rho และให้เลือกกำหนดเองได้
+    st.write(f"💡 Rho ที่ต้องการจากการคำนวณ: **{calc_lo:.5f}**")
+    use_custom_rho = st.checkbox("กำหนดค่า Rho เอง (M+)", key="chk_rho_pos")
+    if use_custom_rho:
+        lo = st.number_input("ใส่ค่า Rho ที่ต้องการ (M+)", min_value=0.0, value=float(calc_lo), step=0.001, format="%.5f")
+    else:
+        lo = calc_lo
 
-if MaxP > 0:
-    while Rn < R:
-        lo += 0.0005
-        Rn = lo * F * (1 - (0.5 * lo * m))
-
-ASq = lo * b * d
-st.write(f"⚠️ ความต้องการพื้นที่เหล็กเสริม **(As req)**: {ASq:.2f} sq.cm")
+    ASq = lo * b * d
+    st.write(f"⚠️ ความต้องการพื้นที่เหล็กเสริม **(As req)**: {ASq:.2f} sq.cm")
 
 with col4:
     st.markdown("**เลือกเหล็กเสริม (As Provided M+)**")
@@ -79,7 +89,6 @@ with col4:
 
     AStu = n_m_pos * (math.pi * (dia_m_pos/10)**2 / 4)
     
-    # 🌟 เช็คพื้นที่เหล็ก M+
     if AStu < ASq:
         st.error(f"❌ **NOT OK:** พื้นที่เหล็กที่จัดให้ ({AStu:.2f} sq.cm) น้อยกว่าที่ต้องการ ({ASq:.2f} sq.cm)")
     else:
@@ -93,25 +102,36 @@ st.markdown("---")
 # ==========================================
 st.header("📉 3. ออกแบบรับโมเมนต์ลบ (M-)")
 calc_m_neg = st.checkbox("คลิกเพื่อคำนวณโมเมนต์ลบ (M-) ด้วย")
-MaxP_neg, ASq_neg, AStu_neg, lotu_neg, lo_neg, R_neg, Rn_neg = 0, 0, 0, 0, 0, 0, 0
+MaxP_neg, ASq_neg, AStu_neg, lotu_neg, lo_neg = 0, 0, 0, 0, 0
 rebar_m_neg, n_m_neg = "", 0
 
 if calc_m_neg:
     col5, col6 = st.columns(2)
     with col5:
         MaxP_neg = st.number_input("โมเมนต์ลบสูงสุด Mmax- (Ton-m)", min_value=0.0, value=1.0, step=0.1)
-    
-    R_neg = (100 * MaxP_neg) / (0.9 * b * d**2) if MaxP_neg > 0 else 0
-    lo_neg = 14 / F
-    Rn_neg = lo_neg * F * (1 - (0.5 * lo_neg * m))
-    
-    if MaxP_neg > 0:
-        while Rn_neg < R_neg:
-            lo_neg += 0.001
-            Rn_neg = lo_neg * F * (1 - (0.5 * lo_neg * m))
+        
+        # คำนวณ Rho ที่ต้องการ (M-)
+        if MaxP_neg > 0:
+            R_neg = (100 * MaxP_neg) / (0.9 * b * d**2)
+            calc_lo_neg = 14 / F
+            m = F / (0.85 * C)
+            Rn_neg = calc_lo_neg * F * (1 - (0.5 * calc_lo_neg * m))
+            while Rn_neg < R_neg:
+                calc_lo_neg += 0.001
+                Rn_neg = calc_lo_neg * F * (1 - (0.5 * calc_lo_neg * m))
+        else:
+            calc_lo_neg = 0.0
             
-    ASq_neg = lo_neg * b * d
-    st.write(f"⚠️ ความต้องการพื้นที่เหล็กเสริม **(As req)** สำหรับ M-: {ASq_neg:.2f} sq.cm")
+        # 🌟 ฟีเจอร์ใหม่: โชว์ Rho และให้เลือกกำหนดเองได้ (M-)
+        st.write(f"💡 Rho ที่ต้องการจากการคำนวณ: **{calc_lo_neg:.5f}**")
+        use_custom_rho_neg = st.checkbox("กำหนดค่า Rho เอง (M-)", key="chk_rho_neg")
+        if use_custom_rho_neg:
+            lo_neg = st.number_input("ใส่ค่า Rho ที่ต้องการ (M-)", min_value=0.0, value=float(calc_lo_neg), step=0.001, format="%.5f")
+        else:
+            lo_neg = calc_lo_neg
+
+        ASq_neg = lo_neg * b * d
+        st.write(f"⚠️ ความต้องการพื้นที่เหล็กเสริม **(As req)** สำหรับ M-: {ASq_neg:.2f} sq.cm")
     
     with col6:
         st.markdown("**เลือกเหล็กเสริม (As Provided M-)**")
@@ -130,7 +150,6 @@ if calc_m_neg:
 
         AStu_neg = n_m_neg * (math.pi * (dia_m_neg/10)**2 / 4)
         
-        # 🌟 เช็คพื้นที่เหล็ก M-
         if AStu_neg < ASq_neg:
             st.error(f"❌ **NOT OK:** พื้นที่เหล็กที่จัดให้ ({AStu_neg:.2f} sq.cm) น้อยกว่าที่ต้องการ ({ASq_neg:.2f} sq.cm)")
         else:
@@ -212,7 +231,6 @@ if st.button("ประมวลผลและสร้างไฟล์ PDF",
     pdf.cell(0, 7, f'Required As = {ASq:.3f} sq.cm', 0, 1)
     pdf.cell(0, 7, f'Provided As = {n_m_pos:.0f}-{rebar_m_pos} (Area = {AStu:.2f} sq.cm, Actual Rho = {lotu:.5f})', 0, 1)
     
-    # 🌟 เช็คเงื่อนไขปริ้นท์ PDF M+
     if AStu >= ASq and lotu <= LoMax:
         pdf.set_text_color(0, 100, 0)
         pdf.cell(0, 7, f'Check: As_prov >= As_req & Rho <= Rho_max ---> OK!', 0, 1)
@@ -234,7 +252,6 @@ if st.button("ประมวลผลและสร้างไฟล์ PDF",
         pdf.cell(0, 7, f'Required As = {ASq_neg:.3f} sq.cm', 0, 1)
         pdf.cell(0, 7, f'Provided As = {n_m_neg:.0f}-{rebar_m_neg} (Area = {AStu_neg:.2f} sq.cm, Actual Rho = {lotu_neg:.5f})', 0, 1)
         
-        # 🌟 เช็คเงื่อนไขปริ้นท์ PDF M-
         if AStu_neg >= ASq_neg and lotu_neg <= LoMax:
             pdf.set_text_color(0, 100, 0)
             pdf.cell(0, 7, f'Check: As_prov >= As_req & Rho <= Rho_max ---> OK!', 0, 1)
