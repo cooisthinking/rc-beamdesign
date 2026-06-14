@@ -1,0 +1,7 @@
+# ไฟล์ชั่วคราว
+Temp_Report.pdf
+cross_section.png
+
+# ไฟล์ระบบของ Python
+__pycache__/
+*.pyc
