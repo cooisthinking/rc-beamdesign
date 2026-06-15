@@ -8,7 +8,7 @@ class PDF(FPDF):
         self.line(10, 20, 200, 20)
         self.ln(5)
 
-def create_pdf(b, h, cov, d, C, F, LoMax, MaxP, ASq, n_m_pos, rebar_m_pos, AStu, lotu, calc_m_neg, MaxP_neg, ASq_neg, n_m_neg, rebar_m_neg, AStu_neg, lotu_neg, Vu, Vc, Vs_req, rebar_v, spacing, es, ey, img_path):
+def create_pdf(b, h, cov, d, C, F, LoMax, MaxP, ASq, n_m_pos, rebar_m_pos, AStu, lotu, calc_m_neg, MaxP_neg, ASq_neg, n_m_neg, rebar_m_neg, AStu_neg, lotu_neg, Vu,phi_Vc, Vs_req, rebar_v, spacing, es, ey, img_path):
     pdf = PDF()
     pdf.add_page()
     left_w = 110 
@@ -63,7 +63,7 @@ def create_pdf(b, h, cov, d, C, F, LoMax, MaxP, ASq, n_m_pos, rebar_m_pos, AStu,
     pdf.cell(left_w, 8, '4. Shear Design', 0, 1)
     pdf.set_font('Arial', '', 11)
     pdf.cell(left_w, 7, f'Ultimate Shear (Vu) = {Vu:.2f} kg', 0, 1)
-    pdf.cell(left_w, 7, f'Concrete Capacity (phi Vc) = {Vc:.2f} kg', 0, 1)
+    pdf.cell(left_w, 7, f'Concrete Capacity (phi Vc) = {phi_Vc:.2f} kg', 0, 1)
     if Vs_req > 0:
         pdf.cell(left_w, 7, f'Req. Stirrup Force (Vs req) = {Vs_req:.2f} kg', 0, 1)
     pdf.cell(left_w, 7, f'Stirrup Provided = {rebar_v} @ {spacing:.0f} cm', 0, 1)
@@ -82,7 +82,7 @@ def create_pdf(b, h, cov, d, C, F, LoMax, MaxP, ASq, n_m_pos, rebar_m_pos, AStu,
         pdf.cell(left_w, 7, 'Result: Compression Controlled -> NOT OK!', 0, 1)
 
     if os.path.exists(img_path):
-        pdf.image(img_path, x=130, y=40, w=60)
+        pdf.image(img_path, x=130, y=40, w=75)
 
     temp_pdf_name = "Temp_Report.pdf"
     pdf.output(temp_pdf_name)
